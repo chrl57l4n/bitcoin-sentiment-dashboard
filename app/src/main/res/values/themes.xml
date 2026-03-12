@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme: no title bar, dark background matching the dashboard -->
+    <style name="Theme.BitcoinDashboard" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">#060a10</item>
+        <item name="android:statusBarColor">#060a10</item>
+        <item name="android:navigationBarColor">#060a10</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <!-- Hardware-accelerated rendering for Snapdragon Adreno GPU -->
+        <item name="android:hardwareAccelerated">true</item>
+    </style>
+</resources>
