@@ -24,7 +24,22 @@ jobs:
       - name: Create launcher icons (Python/Pillow)
         run: |
           pip install Pillow --quiet --break-system-packages
-          python3 make_icons.py
+          python3 -c "
+import os
+from PIL import Image, ImageDraw
+sizes = {'mipmap-mdpi':48,'mipmap-hdpi':72,'mipmap-xhdpi':96,'mipmap-xxhdpi':144,'mipmap-xxxhdpi':192}
+for folder, size in sizes.items():
+    out = 'app/src/main/res/' + folder
+    os.makedirs(out, exist_ok=True)
+    img = Image.new('RGBA', (size, size), (0,0,0,0))
+    d = ImageDraw.Draw(img)
+    d.ellipse([0,0,size-1,size-1], fill=(247,147,26,255))
+    p = size//4
+    d.ellipse([p,p,size-p-1,size-p-1], fill=(26,8,0,255))
+    img.save(out+'/ic_launcher.png')
+    img.save(out+'/ic_launcher_round.png')
+    print('Created '+out+'/ic_launcher.png ('+str(size)+'x'+str(size)+')')
+"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
