@@ -21,22 +21,32 @@ jobs:
           mkdir -p app/src/main/assets
           cp bitcoin-enhanced.html app/src/main/assets/bitcoin-enhanced.html
 
-      - name: Create launcher icons (ImageMagick)
+      - name: Create launcher icons (Python/Pillow)
         run: |
-          for ENTRY in "mipmap-mdpi:48" "mipmap-hdpi:72" "mipmap-xhdpi:96" "mipmap-xxhdpi:144" "mipmap-xxxhdpi:192"; do
-            FOLDER="${ENTRY%%:*}"
-            SIZE="${ENTRY##*:}"
-            DIR="app/src/main/res/$FOLDER"
-            mkdir -p "$DIR"
-            convert -size ${SIZE}x${SIZE} xc:none \
-              -fill "#f7931a" \
-              -draw "circle $((SIZE/2)),$((SIZE/2)) $((SIZE/2)),1" \
-              -fill "#1a0800" \
-              -draw "circle $((SIZE/2)),$((SIZE/2)) $((SIZE/2)),$((SIZE/5))" \
-              "$DIR/ic_launcher.png"
-            cp "$DIR/ic_launcher.png" "$DIR/ic_launcher_round.png"
-            echo "Icon ${SIZE}x${SIZE} -> $DIR"
-          done
+          pip install Pillow --quiet --break-system-packages
+          python3 << 'PYEOF'
+import os
+from PIL import Image, ImageDraw
+
+sizes = {
+    "mipmap-mdpi":    48,
+    "mipmap-hdpi":    72,
+    "mipmap-xhdpi":   96,
+    "mipmap-xxhdpi":  144,
+    "mipmap-xxxhdpi": 192,
+}
+for folder, size in sizes.items():
+    out = f"app/src/main/res/{folder}"
+    os.makedirs(out, exist_ok=True)
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.ellipse([0, 0, size - 1, size - 1], fill=(247, 147, 26, 255))
+    pad = size // 4
+    d.ellipse([pad, pad, size - pad - 1, size - pad - 1], fill=(26, 8, 0, 255))
+    img.save(f"{out}/ic_launcher.png")
+    img.save(f"{out}/ic_launcher_round.png")
+    print(f"  {out}/ic_launcher.png ({size}x{size})")
+PYEOF
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
