@@ -21,6 +21,23 @@ jobs:
           mkdir -p app/src/main/assets
           cp bitcoin-enhanced.html app/src/main/assets/bitcoin-enhanced.html
 
+      - name: Create launcher icons (ImageMagick)
+        run: |
+          for ENTRY in "mipmap-mdpi:48" "mipmap-hdpi:72" "mipmap-xhdpi:96" "mipmap-xxhdpi:144" "mipmap-xxxhdpi:192"; do
+            FOLDER="${ENTRY%%:*}"
+            SIZE="${ENTRY##*:}"
+            DIR="app/src/main/res/$FOLDER"
+            mkdir -p "$DIR"
+            convert -size ${SIZE}x${SIZE} xc:none \
+              -fill "#f7931a" \
+              -draw "circle $((SIZE/2)),$((SIZE/2)) $((SIZE/2)),1" \
+              -fill "#1a0800" \
+              -draw "circle $((SIZE/2)),$((SIZE/2)) $((SIZE/2)),$((SIZE/5))" \
+              "$DIR/ic_launcher.png"
+            cp "$DIR/ic_launcher.png" "$DIR/ic_launcher_round.png"
+            echo "Icon ${SIZE}x${SIZE} -> $DIR"
+          done
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
